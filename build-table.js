@@ -18,6 +18,8 @@ btnAdd.addEventListener('click', () => {
     let age = ageInput.value;
     let country = countryInput.value;
 
+    addPerson('Nowmi', '25', 'USA');
+
     let template =
                 `<tr>
                     <td>${name}</td>
@@ -28,4 +30,6 @@ btnAdd.addEventListener('click', () => {
     table.innerHTML += template;
 });
 
-addPerson('Nowmi', '25', 'USA');
+// Compiled and ran like so:
+// emcc -o table.html table.cpp --shell-file build-table.html -sNO_EXIT_RUNTIME=1 -sEXPORTED_FUNCTIONS=_addPerson -sEXPORTED_RUNTIME_METHODS=ccall,cwrap --emrun
+// emrun table.html
