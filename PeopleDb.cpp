@@ -10,16 +10,22 @@ using namespace std;
 class PersonInfo
 {
 private:
+    int uniqueId;
     string name;
     string age;
     string country;
 public:
-
-    PersonInfo(string name, string age, string country)
+    PersonInfo(int uniqueId, string name, string age, string country)
     {
+        this->uniqueId = uniqueId;
         this->name = name;
         this->age = age;
         this->country = country;
+    }
+
+    int getUniqueId()
+    {
+        return this->uniqueId;
     }
 
     string getName()
@@ -36,22 +42,86 @@ public:
     {
         return this->country;
     }
+
+    void setName(string newName)
+    {
+        this->name = newName;
+    }
+
+    void setAge(string newAge)
+    {
+        this->age = newAge;
+    }
+
+    void setCountry(string newCountry)
+    {
+        this->country = newCountry;
+    }
 };
 
 class PeopleDb
 {
 private:
-    // std::list<PersonInfo>::iterator personIterator;
+    int nextUniqueId = 0;
 public:
     vector<PersonInfo> peopleVector;
 
     PeopleDb()
     {
     }
-    void addPerson(string name, string age, string country)
+    int addPerson(string name, string age, string country)
     {
-        PersonInfo* person = new PersonInfo(name, age, country);
+        // Assign this person a unique Id
+        int newPersonsUid = nextUniqueId;
+        PersonInfo* person = new PersonInfo(newPersonsUid, name, age, country);
         peopleVector.push_back(*person);
+        nextUniqueId++;
+        return newPersonsUid;
+    }
+
+
+    int deletePersonWithUid(string uid)
+    {
+        int personDeleted = -1;
+        int uidInt = std::stoi(uid);
+        for (int i=0; i < peopleVector.size(); i++)
+        {
+            if (peopleVector.at(i).getUniqueId() == uidInt)
+            {
+                peopleVector.erase(peopleVector.begin()+i);
+                personDeleted = 1;
+            }
+        }
+        return personDeleted;
+    }
+
+
+    int updatePersonWithUid(string uid, string updatedName, string updatedAge, string updatedCountry)
+    {
+        int personUpdated = -1;
+        int uidInt = std::stoi(uid);
+        for (int i=0; i < peopleVector.size(); i++)
+        {
+            if (peopleVector.at(i).getUniqueId() == uidInt)
+            {
+                if (!updatedName.empty())
+                {
+                    peopleVector.at(i).setName(updatedName);
+                    personUpdated = 1;
+                }
+                if (!updatedAge.empty())
+                {
+                    peopleVector.at(i).setAge(updatedAge);
+                    personUpdated = 1;
+                }
+                if (!updatedCountry.empty())
+                {
+                    peopleVector.at(i).setCountry(updatedCountry);
+                    personUpdated = 1;
+                }
+            }
+        }
+        return personUpdated;
     }
 
     int getDbSize()
@@ -59,9 +129,23 @@ public:
         return peopleVector.size();
     }
 
-    string getPersonAtRow(int idx)
+    string getPersonWithUid(string uid)
     {
-        string retstr = peopleVector.at(idx).getName() + ", " + peopleVector.at(idx).getAge() + ", " + peopleVector.at(idx).getCountry();
+        string retstr = "Could not find person with this UID";
+        int uidInt = std::stoi(uid);
+        for (int i=0; i < peopleVector.size(); i++)
+        {
+            if (peopleVector.at(i).getUniqueId() == uidInt)
+            {
+                retstr = std::to_string(peopleVector.at(i).getUniqueId()) + ", " + peopleVector.at(i).getName() + ", " + peopleVector.at(i).getAge() + ", " + peopleVector.at(i).getCountry();;
+            }
+        }
+        return retstr;
+    }
+
+    string getPersonAtRowUid(int idx)
+    {
+        string retstr = std::to_string(peopleVector.at(idx).getUniqueId());
         return retstr;
     }
 
@@ -90,7 +174,11 @@ EMSCRIPTEN_BINDINGS(peopledb) {
     .constructor<>()
     .function("getDbSize", &PeopleDb::getDbSize)
     .function("addPerson", &PeopleDb::addPerson)
-    .function("getPersonAtRow", &PeopleDb::getPersonAtRow)
+    .function("addPerson", &PeopleDb::addPerson)
+    .function("deletePersonWithUid", &PeopleDb::deletePersonWithUid)
+    .function("updatePersonWithUid", &PeopleDb::updatePersonWithUid)
+    .function("getPersonWithUid", &PeopleDb::getPersonWithUid)
+    .function("getPersonAtRowUid", &PeopleDb::getPersonAtRowUid)
     .function("getPersonAtRowName", &PeopleDb::getPersonAtRowName)
     .function("getPersonAtRowAge", &PeopleDb::getPersonAtRowAge)
     .function("getPersonAtRowCountry", &PeopleDb::getPersonAtRowCountry)
