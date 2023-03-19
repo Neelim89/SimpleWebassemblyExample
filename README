@@ -1,6 +1,7 @@
 This webassembly example has a c++ class that is used to store different people's names, ages, and country of residence. The c++ class does so by using a PersonInfo class, which is a class that is used to store this information for one person. The c++ class then has a vector of these objects and has utility methods to add, delete, update, or get a persion either with their id, row number in the table, name, age, or country. These getter, update, and add functions are then bound by emscripten so they can be used by other Javascript Modules.
 The wasm file that is compiled from the c++ is created by executing this command:
 emcc -lembind -o PeopleDb_wa_gen.js PeopleDb.cpp
+Note that you will need to source the emsdk_env.sh file to setup the emscripten environment and use the emcc command.
 This generates the "PeopleDb_wa_gen.wasm" and "PeopleDb_wa_gen.js" files. The "PeopleDb_wa_gen.wasm" is the compiled webassembly, and a wrapper, PeopleDb_wa_gen.js, is created to allow other javascript modules to access the wasm as a javascript module.
 The build-table.js javascript file then uses this PeopleDb module to either add a person with the addPerson c++ method, delete a person with the deletePersonWithUid c++ method, or update a person with the updatePersonWithUid c++ method.
 The application can then be launched using the following command:
