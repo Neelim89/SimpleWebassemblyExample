@@ -121,7 +121,3 @@ var Module = {
         });
     }
 };
-
-// Compiled and ran like so:
-// emcc -o table.html table.cpp --shell-file build-table.html -sNO_EXIT_RUNTIME=1 -sEXPORTED_FUNCTIONS=_addPerson -sEXPORTED_RUNTIME_METHODS=ccall,cwrap --emrun
-// emrun table.html
